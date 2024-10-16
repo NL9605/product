@@ -1,0 +1,232 @@
+/* To keep the existing styles */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+nav {
+    position: fixed;
+    z-index: 99;
+    width: 100%;
+    background: #354B59;
+}
+
+nav .wrapper {
+    position: relative;
+    max-width: 1300px;
+    padding: 0px 30px;
+    height: 70px;
+    line-height: 70px;
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-right: 20%;
+}
+
+.wrapper .logo {
+    margin-top: 10px;
+}
+
+.nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.wrapper .nav-links {
+    display: inline-flex;
+    cursor: pointer;
+}
+
+.nav-links li {
+    list-style: none;
+}
+
+.nav-links li a {
+    position: relative; /* Add relative positioning */
+    color: #f2f2f2;
+    text-decoration: none;
+    font-size: 18px;
+    padding: 9px 15px;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.nav-links li a::after {
+    content: ""; /* Create a pseudo-element */
+    position: absolute;
+    left: 50%;
+    bottom: 0; /* Position at the bottom */
+    width: 0; /* Start with a width of 0 */
+    height: 2px; /* Set the height of the underline */
+    background: #f2f2f2; /* Set the color of the underline */
+    transition: width 0.3s ease, left 0.3s ease; /* Add transition effects */
+}
+
+.nav-links li a:hover::after {
+    width: 100%; /* Full width on hover */
+    left: 0; /* Center the underline */
+}
+
+/* Active link */
+.nav-links li a.active::after {
+    width: 100%; /* Keep the underline visible for the active link */
+    left: 0; /* Center the underline */
+}
+
+.nav-links .mobile-item {
+    display: none;
+}
+
+.wrapper .btn {
+    color: #fff;
+    font-size: 20px;
+    cursor: pointer;
+    display: none;
+}
+
+.wrapper .btn.close-btn {
+    position: absolute;
+    right: 30px;
+    top: 10px;
+}
+
+.search-box__wrapper {
+    display: flex;
+    align-items: center;
+    margin-right: 10px; /* Khoảng trống bên phải */
+    margin-top: 10px; /* Điều chỉnh khoảng cách phía trên để hạ phần tìm kiếm xuống gần hơn với navbar */
+    background: none; /* Loại bỏ màu nền */
+}
+
+.search-box {
+    font-size: 14px;
+    width: 160px;
+    padding: 5px;
+    border-radius: 4px 0 0 4px;
+    color:  #fff;
+}
+
+.search-box__wrapper i{
+    cursor: pointer;
+    color:  #fff;
+}
+
+/* Icon styling */
+.icon {
+    display: flex;
+    align-items: center;
+}
+
+.icon i {
+    margin-left: 10px; /* Căn khoảng cách từ form tìm kiếm */
+    cursor: pointer;
+    font-size: 20px;
+    color: #fff;
+}
+.user-menu {
+    display: none; /* Ẩn menu mặc định */
+    position: absolute; /* Vị trí tuyệt đối */
+    background: #354B59; /* Màu nền của menu trùng với màu nền của nav */
+    border-radius: 5px; /* Bo góc cho menu */
+    padding: 10px; /* Khoảng cách bên trong */
+    top: 60px; /* Điều chỉnh để hạ menu xuống dưới biểu tượng */
+    right: 0; /* Căn phải menu */
+    z-index: 100; /* Đảm bảo menu nằm trên các phần tử khác */
+}
+
+.user-menu a {
+    display: block;
+    color: white;
+    text-decoration: none;
+    margin: 5px 0;
+}
+
+/* Hiển thị menu khi biểu tượng người dùng được click */
+.icon:hover .user-menu {
+    display: block; /* Hiển thị menu khi hover */
+}
+
+
+/* Media queries for responsiveness */
+@media screen and (max-width: 970px) {
+    .wrapper .btn {
+        display: block;
+    }
+
+    .wrapper .nav-links {
+        position: fixed;
+        height: 100vh;
+        width: 100%;
+        max-width: 350px;
+        top: 0;
+        left: -100%;
+        background: #242526;
+        display: block;
+        padding: 50px 10px;
+        line-height: 50px;
+        overflow-y: auto;
+        box-shadow: 0px 15px 15px rgba(0, 0, 0, 0.18);
+        transition: all 0.3s ease;
+    }
+
+    /* Custom scroll bar */
+    ::-webkit-scrollbar {
+        width: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #242526;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #3A3B3C;
+    }
+
+    #menu-btn:checked ~ .nav-links {
+        left: 0;
+    }
+
+    #menu-btn:checked ~ .btn.menu-btn {
+        display: none;
+    }
+
+    #close-btn:checked ~ .btn.menu-btn {
+        display: block;
+    }
+
+    .nav-links li {
+        margin: 15px 10px;
+    }
+
+    .nav-links li a {
+        padding: 0 20px;
+        display: block;
+        font-size: 20px;
+    }
+
+    .nav-links .desktop-item {
+        display: none;
+    }
+
+    .nav-links .mobile-item {
+        display: block;
+        color: #f2f2f2;
+        font-size: 20px;
+        font-weight: 500;
+        padding-left: 20px;
+        cursor: pointer;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+    }
+
+    .nav-links .mobile-item:hover {
+        background: #3A3B3C;
+    }
+}
