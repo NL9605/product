@@ -164,7 +164,7 @@
             $product = $productModel->getProductById($productId);
 
             if ($product) {
-                $imageUrls = !empty($product['image_urls']) ? explode(',', $product['image_urls']) : [];
+                $imageUrls = !empty($product['image']) ? explode(',', $product['image']) : [];
                 if (!empty($imageUrls)) {
                     // Phương Án 1: Điều Chỉnh Đường Dẫn
                     $mainImage = '../../' . htmlspecialchars(trim($imageUrls[0]));

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Danh sách sản phẩm</title>
+    <title>List_Product</title>
     <link rel="stylesheet" href="./assets/css/product.css">
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500&display=swap" rel="stylesheet">
     <style>
@@ -16,10 +16,9 @@
         }
 
         .product-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: flex-start;
-            gap: 20px;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr); /* 5 cột mỗi hàng */
+            gap: 20px; /* Khoảng cách giữa các sản phẩm */
             margin: 20px auto 0 auto;
             padding: 20px;
         }
@@ -28,7 +27,7 @@
             background-color: white;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: calc(20% - 16px);
+            width: 100%; /* Chiếm toàn bộ chiều rộng của cột lưới */
             height: auto;
             overflow: hidden;
             position: relative;
@@ -37,6 +36,7 @@
             margin: 0;
             transition: transform 0.3s ease;
             cursor: pointer;
+            box-sizing: border-box; /* Bao gồm padding và border trong width */
         }
 
         .product-card:hover {
@@ -92,7 +92,7 @@
             margin-bottom: 10px;
         }
 
-        /* Modal styles */
+        /* Modal styles (giữ nguyên) */
         .modal {
             display: none; /* Bắt đầu với trạng thái ẩn */
             position: fixed; /* Đảm bảo modal luôn cố định trên màn hình */
@@ -189,6 +189,11 @@
             background-size: cover;
             background-position: center;
             background-color: #f0f0f0;
+            cursor: pointer;
+        }
+
+        .thumbnails button:hover {
+            border-color: #354B59;
         }
 
         .add-to-cart-btn {
@@ -214,6 +219,65 @@
         .add-to-cart-btn:active {
             transform: scale(0.98);
         }
+
+        /* Thêm style cho phân trang */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+            list-style: none;
+            padding: 0;
+        }
+
+        .pagination li {
+            margin: 0 5px;
+        }
+
+        .pagination a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #354B59;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .pagination a.active {
+            background-color: #354B59;
+            color: white;
+            border-color: #354B59;
+        }
+
+        .pagination a:hover:not(.active) {
+            background-color: #f0f0f0;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1200px) {
+            .product-container {
+                grid-template-columns: repeat(4, 1fr); /* 4 cột mỗi hàng */
+            }
+        }
+
+        @media (max-width: 992px) {
+            .product-container {
+                grid-template-columns: repeat(3, 1fr); /* 3 cột mỗi hàng */
+            }
+        }
+
+        @media (max-width: 768px) {
+            .product-container {
+                grid-template-columns: repeat(2, 1fr); /* 2 cột mỗi hàng */
+            }
+        }
+
+        @media (max-width: 576px) {
+            .product-container {
+                grid-template-columns: 1fr; /* 1 cột mỗi hàng */
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -225,7 +289,7 @@
                 <?php
                 $productId = isset($product['product_id']) ? htmlspecialchars($product['product_id']) : '#';
                 $productName = isset($product['product_name']) ? htmlspecialchars($product['product_name']) : 'Tên sản phẩm không có';
-                $imageUrls = !empty($product['image_urls']) ? explode(',', htmlspecialchars($product['image_urls'])) : [];
+                $imageUrls = !empty($product['image']) ? explode(',', htmlspecialchars($product['image'])) : [];
                 ?>
                 <?php if (!empty($imageUrls) && count($imageUrls) > 0): ?>
                     <a href="http://localhost/Fanimation/shop/views/product/product_detail.php?id=<?php echo $productId; ?>">
@@ -262,6 +326,31 @@
     <?php endforeach; ?>
 </div>
 
+<!-- Phân trang -->
+<?php if ($totalPages > 1): ?>
+    <ul class="pagination">
+        <?php if ($currentPage > 1): ?>
+            <li><a href="?page=<?php echo $currentPage - 1; ?>">&laquo; Previous</a></li>
+        <?php endif; ?>
+        <?php
+        // Xác định số trang hiển thị
+        $maxLinks = 5;
+        $start = max($currentPage - floor($maxLinks / 2), 1);
+        $end = min($start + $maxLinks - 1, $totalPages);
+        if ($end - $start + 1 < $maxLinks) {
+            $start = max($end - $maxLinks + 1, 1);
+        }
+
+        for ($i = $start; $i <= $end; $i++): ?>
+            <li><a href="?page=<?php echo $i; ?>" class="<?php echo ($i === $currentPage) ? 'active' : ''; ?>"><?php echo $i; ?></a></li>
+        <?php endfor; ?>
+        <?php if ($currentPage < $totalPages): ?>
+            <li><a href="?page=<?php echo $currentPage + 1; ?>">Next &raquo;</a></li>
+        <?php endif; ?>
+    </ul>
+<?php endif; ?>
+
+<!-- Modal -->
 <div id="quick-view-modal" class="modal" style="display:none;">
 
     <div class="modal-content">
@@ -275,9 +364,12 @@
             <h2 id="modal-product-name"></h2>
             <p id="modal-product-description"></p>
             <p id="modal-product-price"></p>
+            <p id="modal-product-discount-price"></p>
             <div id="modal-product-color" class="color-boxes"></div>
             <div class="color-name" id="selected-color-name"></div>
-            <button class="add-to-cart-btn">Thêm vào giỏ hàng</button>
+            <button class="add-to-cart-btn">Add to cart</button>
+            <div id="cart-message" style="color: green; margin-top: 10px; display: none;"></div>
+
         </div>
 
     </div>
@@ -298,21 +390,34 @@
         });
     });
 
+    // Xử lý modal Quick View
     const modal = document.getElementById('quick-view-modal');
     const closeModal = document.querySelector('.close');
     const modalProductName = document.getElementById('modal-product-name');
     const modalProductDescription = document.getElementById('modal-product-description');
     const modalProductPrice = document.getElementById('modal-product-price');
+    const modalProductDiscountPrice = document.getElementById('modal-product-discount-price'); // Thêm phần tử này cho giá sau giảm
     const modalProductImage = document.getElementById('modal-product-image');
     const modalProductColors = document.getElementById('modal-product-color');
     const selectedColorName = document.getElementById('selected-color-name');
     const thumbnailsContainer = document.getElementById('image-thumbnails');
+    const cartMessage = document.getElementById('cart-message');
+
+    let selectedColor = null; // Biến lưu trữ màu đã chọn
 
     document.querySelectorAll('.quick-view').forEach((quickView) => {
         quickView.addEventListener('click', () => {
             modalProductName.textContent = quickView.getAttribute('data-name');
             modalProductDescription.innerHTML = quickView.getAttribute('data-description');
-            modalProductPrice.textContent = quickView.getAttribute('data-price');
+
+            // Lấy giá và giá giảm
+            const productPrice = parseFloat(quickView.getAttribute('data-price'));
+            const productDiscount = parseFloat(quickView.getAttribute('data-discount'));
+
+            // Hiển thị giá gốc và giá giảm
+            modalProductPrice.textContent = `Giá: ${productPrice.toLocaleString()} $`;
+            modalProductDiscountPrice.textContent = productDiscount ? `Giá khuyến mãi: ${productDiscount.toLocaleString()} $` : '';
+
             const imageUrls = quickView.getAttribute('data-image').split(',');
             modalProductImage.src = imageUrls[0];
 
@@ -326,17 +431,46 @@
                 thumbnailsContainer.appendChild(button);
             });
 
-            const colors = quickView.getAttribute('data-colors').split(',');
+            const colors = quickView.getAttribute('data-colors') ? quickView.getAttribute('data-colors').split(',') : [];
             modalProductColors.innerHTML = '';
-            colors.forEach((color) => {
-                const colorBox = document.createElement('div');
-                colorBox.className = 'color-box';
-                colorBox.style.backgroundColor = color;
-                modalProductColors.appendChild(colorBox);
-            });
+            selectedColor = null; // Đặt lại màu đã chọn khi mở modal
 
-            selectedColorName.textContent = colors.length > 0 ? 'Màu sắc đã chọn' : 'Không có màu sắc nào';
+            if (colors.length > 0) {
+                colors.forEach((color) => {
+                    const colorBox = document.createElement('div');
+                    colorBox.className = 'color-box';
+                    colorBox.style.backgroundColor = color;
+
+                    // Thêm sự kiện để chọn màu
+                    colorBox.addEventListener('click', () => {
+                        selectedColor = color; // Cập nhật màu đã chọn
+                        selectedColorName.textContent = `Selected color: ${color}`;
+                    });
+
+                    modalProductColors.appendChild(colorBox);
+                });
+                selectedColorName.textContent = 'Chọn màu:';
+            } else {
+                selectedColorName.textContent = 'Sản phẩm này không có màu.';
+            }
+
             modal.style.display = 'block';
+
+            // Lấy thông tin sản phẩm để sử dụng cho addToCart
+            const productId = quickView.getAttribute('data-product-id');
+            const productName = quickView.getAttribute('data-name');
+
+            // Thêm sự kiện cho nút "Add to cart"
+            const addToCartBtn = document.querySelector('.add-to-cart-btn');
+            addToCartBtn.onclick = () => {
+                // Nếu sản phẩm không có màu, cho phép thêm vào giỏ hàng mà không cần chọn màu
+                if (colors.length > 0 && !selectedColor) {
+                    alert('Vui lòng chọn màu trước khi thêm vào giỏ hàng!');
+                    return;
+                }
+
+                addToCart(productId, productName, productDiscount || productPrice, selectedColor);
+            };
         });
     });
 
@@ -350,6 +484,32 @@
         }
     });
 
+    function addToCart(productId, productName, productPrice, selectedColor) {
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+        const existingProductIndex = cart.findIndex(item => item.id === productId && item.color === selectedColor);
+
+        if (existingProductIndex !== -1) {
+            // Nếu sản phẩm đã có trong giỏ hàng, tăng số lượng
+            cart[existingProductIndex].quantity += 1;
+        } else {
+            // Nếu không, thêm sản phẩm mới vào giỏ hàng
+            cart.push({ id: productId, name: productName, price: productPrice, color: selectedColor || 'Không màu', quantity: 1 });
+        }
+
+        localStorage.setItem('cart', JSON.stringify(cart));
+
+        // Hiển thị thông báo đã thêm vào giỏ hàng
+        cartMessage.textContent = `${productName} ${selectedColor ? `màu ${selectedColor}` : 'không có màu'} đã được thêm vào giỏ hàng!`;
+        cartMessage.style.display = 'block';
+
+        // Ẩn thông báo sau 3 giây
+        setTimeout(() => {
+            cartMessage.style.display = 'none';
+        }, 3000);
+    }
 </script>
+
+
+
 </body>
 </html>

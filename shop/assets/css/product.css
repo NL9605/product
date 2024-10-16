@@ -1,17 +1,16 @@
 body {
     font-family: 'Open Sans', sans-serif;
     margin: 0;
-    padding-top: 0; /* Thêm khoảng cách trên để tránh trùng với header */
-    padding-bottom: 100px; /* Thêm khoảng cách dưới để tránh trùng với footer */
+    padding: 0 70px;
+    padding-bottom: 100px;
     background-color: white;
 }
 
 .product-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    gap: 50px;
-    margin: 45px auto 0 auto;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* 5 cột mỗi hàng */
+    gap: 20px; /* Khoảng cách giữa các sản phẩm */
+    margin: 20px auto 0 auto;
     padding: 20px;
 }
 
@@ -19,15 +18,16 @@ body {
     background-color: white;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 270px;
+    width: 100%; /* Chiếm toàn bộ chiều rộng của cột lưới */
     height: auto;
     overflow: hidden;
     position: relative;
     text-align: center;
     padding: 10px;
-    margin: 0 10px 20px;
+    margin: 0;
     transition: transform 0.3s ease;
     cursor: pointer;
+    box-sizing: border-box; /* Bao gồm padding và border trong width */
 }
 
 .product-card:hover {
@@ -83,7 +83,19 @@ h2 {
     margin-bottom: 10px;
 }
 
-/* Modal CSS */
+/* Modal styles (giữ nguyên) */
+.modal {
+    display: none; /* Bắt đầu với trạng thái ẩn */
+    position: fixed; /* Đảm bảo modal luôn cố định trên màn hình */
+    z-index: 1000; /* Đảm bảo modal hiển thị trên tất cả các nội dung khác */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Làm tối phần nền */
+    overflow: auto; /* Đảm bảo nội dung modal có thể cuộn nếu vượt quá chiều cao màn hình */
+}
+
 .modal-content {
     display: flex;
     flex-direction: row;
@@ -101,9 +113,9 @@ h2 {
 .modal-left {
     flex: 1;
     display: flex;
-    flex-direction: column; /* Thay đổi từ row sang column */
-    align-items: center; /* Căn giữa các phần tử */
-    justify-content: flex-start; /* Căn trên */
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
     padding-right: 30px;
 }
 
@@ -128,6 +140,7 @@ h2 {
     font-size: 1.2rem;
     color: #555;
     margin-bottom: 20px;
+    line-height: 1.5;
 }
 
 #modal-product-price {
@@ -151,43 +164,107 @@ h2 {
 }
 
 .thumbnails {
-    display: flex; /* Để các nút nằm trong cùng một hàng */
-    flex-direction: row; /* Sắp xếp theo chiều ngang */
+    display: flex;
+    flex-direction: row;
     margin-top: 15px;
-    overflow-x: auto; /* Cho phép cuộn nếu quá nhiều nút */
+    overflow-x: auto;
 }
 
 .thumbnails button {
     border: 2px solid transparent;
     border-radius: 5px;
     transition: border-color 0.3s ease;
-    width: 80px; /* Chiều rộng của nút thumbnail */
-    height: 80px; /* Chiều cao của nút thumbnail */
-    margin-right: 5px; /* Khoảng cách giữa các nút */
-    background-size: cover; /* Đảm bảo hình ảnh vừa với nút */
-    background-position: center; /* Căn giữa hình ảnh trong nút */
-    background-color: #f0f0f0; /* Màu nền mặc định */
+    width: 80px;
+    height: 80px;
+    margin-right: 5px;
+    background-size: cover;
+    background-position: center;
+    background-color: #f0f0f0;
+    cursor: pointer;
 }
+
+.thumbnails button:hover {
+    border-color: #354B59;
+}
+
 .add-to-cart-btn {
-    background-color: #354B59; /* Màu nền */
-    color: white; /* Màu chữ */
-    border: none; /* Loại bỏ đường viền */
-    border-radius: 5px; /* Bo tròn góc */
-    padding: 12px 20px; /* Khoảng cách bên trong */
-    font-size: 1.2rem; /* Kích thước chữ */
-    font-weight: bold; /* Chữ đậm */
-    cursor: pointer; /* Thêm con trỏ dạng bàn tay */
-    transition: background-color 0.3s ease, transform 0.2s ease; /* Hiệu ứng khi hover */
-    width: 100%; /* Chiếm toàn bộ chiều rộng của khung chứa */
-    max-width: 300px; /* Giới hạn chiều rộng tối đa */
-    margin-top: 20px; /* Khoảng cách bên trên nút */
+    background-color: #354B59;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 12px 20px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    width: 100%;
+    max-width: 300px;
+    margin-top: 20px;
 }
 
 .add-to-cart-btn:hover {
-    background-color: #133447; /* Màu khi hover */
-    transform: scale(1.05); /* Phóng to nhẹ khi hover */
+    background-color: #133447;
+    transform: scale(1.05);
 }
 
 .add-to-cart-btn:active {
-    transform: scale(0.98); /* Hiệu ứng thu nhỏ khi nhấn giữ */
+    transform: scale(0.98);
+}
+
+/* Thêm style cho phân trang */
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+    list-style: none;
+    padding: 0;
+}
+
+.pagination li {
+    margin: 0 5px;
+}
+
+.pagination a {
+    display: block;
+    padding: 8px 12px;
+    text-decoration: none;
+    color: #354B59;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.pagination a.active {
+    background-color: #354B59;
+    color: white;
+    border-color: #354B59;
+}
+
+.pagination a:hover:not(.active) {
+    background-color: #f0f0f0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+    .product-container {
+        grid-template-columns: repeat(4, 1fr); /* 4 cột mỗi hàng */
+    }
+}
+
+@media (max-width: 992px) {
+    .product-container {
+        grid-template-columns: repeat(3, 1fr); /* 3 cột mỗi hàng */
+    }
+}
+
+@media (max-width: 768px) {
+    .product-container {
+        grid-template-columns: repeat(2, 1fr); /* 2 cột mỗi hàng */
+    }
+}
+
+@media (max-width: 576px) {
+    .product-container {
+        grid-template-columns: 1fr; /* 1 cột mỗi hàng */
+    }
 }
