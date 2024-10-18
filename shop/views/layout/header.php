@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fanimation Navigation</title>
-    <link rel="stylesheet" href="../shop/assets/css/header.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
     <script src="https://kit.fontawesome.com/6ba0c41bed.js"></script>
 </head>
@@ -113,7 +112,7 @@
         display: flex;
         align-items: center;
         margin-right: 10px; /* Khoảng trống bên phải */
-        margin-top: 10px; /* Điều chỉnh khoảng cách phía trên để hạ phần tìm kiếm xuống gần hơn với navbar */
+        margin-top: 0px; /* Increased margin to lower the search box */
     }
 
     .search-box {
@@ -127,9 +126,6 @@
         transition: border-bottom 0.3s; /* Thêm hiệu ứng chuyển tiếp */
     }
 
-    .search-box:focus {
-        border-bottom: 1px solid #fff; /* Thêm đường viền dưới khi được chọn */
-    }
 
     .search-box__wrapper i{
         cursor: pointer;
@@ -263,12 +259,12 @@
                      src="https://fanimation.com/wp-content/uploads/2021/04/Logo_white_1.png">
             </a></div>
         <div class="nav-container">
-<!--            <input type="radio" name="slider" id="menu-btn">-->
-<!--            <input type="radio" name="slider" id="close-btn">-->
+            <!--            <input type="radio" name="slider" id="menu-btn">-->
+            <!--            <input type="radio" name="slider" id="close-btn">-->
             <ul class="nav-links">
                 <label for="close-btn" class="btn close-btn"><i class="fas fa-times"></i></label>
-                <li><a href="#" class="active">Home</a></li>
-                <li><a href="#">Products</a></li>
+                <li><a href="home.php" class="active">Home</a></li>
+                <li><a href="../../controllers/ProductController.php">Products</a></li>
                 <li><a href="#">About Us</a></li>
                 <li><a href="#">Explore</a></li>
                 <li><a href="#">Help Center</a></li>
@@ -363,8 +359,8 @@
             <i class="fa-regular fa-user" id="user-icon"></i>
             <i class="fa-solid fa-cart-shopping" id="cart-icon"></i>
             <div class="user-menu" id="user-menu">
-                <a href="login.html" id="login">Login</a>
-                <a href="signup.html" id="signup">Sign Up</a>
+                <a href="http://localhost/Fanimation/shop/views/customer/login.php" id="login">Login</a>
+                <a href="http://localhost/Fanimation/shop/views/customer/login.php" id="signup">Sign Up</a>
                 <a href="#" id="logout" style="display: none;">Logout</a>
             </div>
         </div>
@@ -379,6 +375,7 @@
         });
     });
 
+    // User login/logout functionality
     // User login/logout functionality
     let isLoggedIn = false; // User login state
 
@@ -397,13 +394,13 @@
     // Handle login functionality
     loginLink.addEventListener('click', function(event) {
         event.preventDefault();
-        window.location.href = 'login.html'; // Redirect to login page
+        window.location.href = 'http://localhost/Fanimation/shop/views/customer/login.php'; // Redirect to login page
     });
 
     // Handle signup functionality
     signupLink.addEventListener('click', function(event) {
         event.preventDefault();
-        window.location.href = 'signup.html'; // Redirect to signup page
+        window.location.href = 'http://localhost/Fanimation/shop/views/customer/signup.php'; // Redirect to signup page
     });
 
     // Handle logout functionality
@@ -416,7 +413,7 @@
 
     // Handle cart icon click
     cartIcon.addEventListener('click', function() {
-        window.location.href = 'checkout.html'; // Redirect to checkout page
+        window.location.href = 'http://localhost/Fanimation/shop/views/product/cart.php'; // Redirect to checkout page
     });
 
     function updateUserMenu() {
@@ -432,6 +429,8 @@
         userMenu.style.display = 'none'; // Hide menu after clicking
     }
 
+
 </script>
 </body>
 </html>
+

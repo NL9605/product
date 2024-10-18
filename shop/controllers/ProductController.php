@@ -1,10 +1,13 @@
 <?php
+
+use models\ProductModel;
+
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-include_once "./configs/database.php"; // Kết nối cơ sở dữ liệu
-include_once "./models/ProductModel.php"; // Mô hình sản phẩm
+include_once "../configs/database.php"; // Kết nối cơ sở dữ liệu
+include_once "../models/ProductModel.php"; // Mô hình sản phẩm
 
 class ProductController
 {
@@ -43,14 +46,14 @@ class ProductController
 
         // Truyền dữ liệu vào view
         extract($data);
-        include './views/product/product.php'; // Đảm bảo đường dẫn đúng
+        include '../views/product/product.php'; // Đảm bảo đường dẫn đúng
     }
 
 
     public function showProductDetails($id){
         $product = $this->productModel->getProductById($id);
         if($product){
-            include "./views/product/product_detail.php";
+            include "../views/product/product_detail.php";
         } else {
             echo "<p>Can't find products.</p>";
         }

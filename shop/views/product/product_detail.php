@@ -1,5 +1,13 @@
+<?php
+
+use models\ProductModel;
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+?>
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -128,18 +136,100 @@
         .add-to-cart-btn:active {
             transform: scale(0.98);
         }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .detail-container {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .detail-left, .detail-right {
-                min-width: 100%;
-            }
+        .tabs {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
         }
+
+        /* Style for the tab buttons */
+        .tablinks {
+            background-color: transparent;
+            border: none;
+            outline: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            color: #555;
+            position: relative;
+        }
+
+        /* ::after pseudo-element for the underline */
+        .tablinks::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -5px; /* Adjust for desired spacing from the text */
+            width: 0;
+            height: 2px;
+            background-color: #000;
+            transition: width 0.4s ease; /* Smooth transition effect */
+        }
+
+        /* Hover effect: slide underline in from left to right */
+        .tablinks:hover::after {
+            width: 100%;
+        }
+
+        /* Active tab will have the full underline */
+        .tablinks.active::after {
+            width: 100%;
+        }
+
+        /* Tab content style */
+        .tabcontent {
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Center content horizontally */
+            padding: 20px; /* Add some padding */
+            width: 100%; /* Ensure it takes full width */
+            box-sizing: border-box; /* Include padding in width calculation */
+        }
+
+        .document-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Center items inside the document item */
+            text-align: center; /* Center text */
+            margin: 20px; /* Space between items */
+        }
+
+        .document-item img {
+            width: 80px; /* Set a fixed width for icons */
+            height: auto; /* Maintain aspect ratio */
+            margin-bottom: 10px; /* Space between icon and text */
+        }
+
+        h3 {
+            margin-bottom: 20px; /* Space below the title */
+        }
+        /* Style for each document item */
+        /* Document titles */
+        .document-item p {
+            font-size: 16px;
+            color: #555;
+        }
+        .star {
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: #ccc;
+        }
+
+        .star.selected {
+            color: #FFD700;
+        }
+
+        #reviewResults {
+            margin-top: 20px;
+        }
+
+        .review {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
     </style>
 </head>
 <body>
@@ -151,7 +241,7 @@
             if (isset($_GET['id'])) {
                 $productId = htmlspecialchars($_GET['id']);
             } else {
-                echo "<p>Không xác định được sản phẩm.</p>";
+                echo "<p>Product not identified.</p>";
                 exit;
             }
 
@@ -166,32 +256,38 @@
             if ($product) {
                 $imageUrls = !empty($product['image']) ? explode(',', $product['image']) : [];
                 if (!empty($imageUrls)) {
-                    // Phương Án 1: Điều Chỉnh Đường Dẫn
+                    // Đường dẫn ảnh chính
                     $mainImage = '../../' . htmlspecialchars(trim($imageUrls[0]));
                     ?>
-                    <img id="main-image" src="<?php echo $mainImage; ?>" alt="<?php echo htmlspecialchars($product['product_name']); ?>" onerror="this.onerror=null; this.src='../../uploads/default-image.jpg';">
+                    <img id="main-image" src="<?php echo $mainImage; ?>" alt="<?php echo htmlspecialchars($product['product_name']); ?>"
+                         onerror="this.onerror=null; this.src='../../uploads/default-image.jpg';">
                     <?php if (count($imageUrls) > 1): ?>
                         <div class="thumbnails">
                             <?php
                             foreach ($imageUrls as $image) {
                                 $thumbnailPath = '../../' . htmlspecialchars(trim($image));
-                                echo '<img src="' . $thumbnailPath . '" alt="Thumbnail" onerror="this.onerror=null; this.src=\'../../uploads/default-image.jpg\';" onclick="document.getElementById(\'main-image\').src=\'' . $thumbnailPath . '\'">';
+                                ?>
+                                <img src="<?php echo $thumbnailPath; ?>" alt="Thumbnail"
+                                     onerror="this.onerror=null; this.src='../../uploads/default-image.jpg';"
+                                     onclick="document.getElementById('main-image').src='<?php echo $thumbnailPath; ?>'">
+                                <?php
                             }
                             ?>
                         </div>
                     <?php endif; ?>
                     <?php
                 } else {
-                    // Nếu không có hình ảnh, hiển thị hình mặc định
                     ?>
-                    <img id="main-image" src="../../uploads/default-image.jpg" alt="Hình ảnh không có" onerror="this.onerror=null; this.src='../../uploads/default-image.jpg';">
+                    <img id="main-image" src="../../uploads/default-image.jpg" alt="No Image"
+                         onerror="this.onerror=null; this.src='../../uploads/default-image.jpg';">
                     <?php
                 }
             } else {
-                echo "<p>Không tìm thấy sản phẩm.</p>";
+                echo "<p>Product not found.</p>";
                 exit;
             }
             ?>
+
         </div>
     </div>
     <div class="detail-right">
@@ -202,7 +298,7 @@
             <p class="price"><?php echo number_format($product['price'], 0, ',', '.') . ' $'; ?></p>
             <p class="description"><?php echo nl2br(htmlspecialchars($product['description'])); ?></p>
             <div class="color-options">
-                <span>Chọn màu:</span>
+                <span>Select color:</span>
                 <?php
                 $colors = !empty($product['colors']) ? explode(',', $product['colors']) : [];
                 $colorMapping = [
@@ -222,58 +318,173 @@
                     echo '<div class="color-box" style="background-color: ' . $colorHex . ';" title="' . htmlspecialchars($color) . '" onclick="selectColor(this, \'' . htmlspecialchars($color) . '\')"></div>';
                 }
                 ?>
-                <span class="selected-color" id="selected-color-name">Chưa chọn</span>
+                <span class="selected-color" id="selected-color-name">Not selected</span>
             </div>
-            <button class="add-to-cart-btn" data-product-id="<?php echo htmlspecialchars($product['product_id']); ?>" onclick="addToCart('<?php echo htmlspecialchars($product['product_id']); ?>')">Thêm vào giỏ hàng</button>
+            <button class="add-to-cart-btn" data-product-id="<?php echo htmlspecialchars($product['product_id']); ?>" onclick="addToCart('<?php echo htmlspecialchars($product['product_id']); ?>')">Add to cart</button>
             <?php
         }
         ?>
     </div>
 </div>
+<div class="tabs">
+    <button class="tablinks" onclick="openTab(event, 'Review')" id="defaultOpen">REVIEW</button>
+    <button class="tablinks" onclick="openTab(event, 'AdditionalInfo')">ADDITIONAL INFORMATION</button>
+    <button class="tablinks" onclick="openTab(event, 'SupportDocs')">SUPPORT DOCUMENTS</button>
+</div>
+
+<div id="Review" class="tabcontent">
+    <h3>Review</h3>
+    <div id="reviewResults">
+        <form id="reviewForm" method="POST">
+            <input type="hidden" name="product_id" value="<?php echo $productId; ?>">
+            <label for="reviewer_name">Reviewer name:</label>
+            <input type="text" name="reviewer_name" required>
+            <br>
+            <label for="rating">Review:</label>
+            <div id="rating" class="rating">
+                <span class="star" data-value="1" onclick="selectStar(this)">★</span>
+                <span class="star" data-value="2" onclick="selectStar(this)">★</span>
+                <span class="star" data-value="3" onclick="selectStar(this)">★</span>
+                <span class="star" data-value="4" onclick="selectStar(this)">★</span>
+                <span class="star" data-value="5" onclick="selectStar(this)">★</span>
+            </div>
+            <input type="hidden" name="rating" required>
+
+            <label for="review_text">Comment:</label>
+            <textarea name="review_text" rows="4" required></textarea>
+
+            <button type="submit">Submit review</button>
+        </form>
+
+        <!-- Hiển thị các đánh giá từ cơ sở dữ liệu -->
+        <div id="existingReviews">
+            <?php
+            // Truy vấn các đánh giá từ cơ sở dữ liệu
+            $reviewSql = "SELECT reviewer_name, rating, comment, created_at FROM Review WHERE product_id = :product_id";
+            $stmt = $conn->prepare($reviewSql);
+            $stmt->bindParam(':product_id', $productId, PDO::PARAM_INT);
+            $stmt->execute();
+            $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            if ($reviews) {
+                foreach ($reviews as $review) {
+                    echo "<div class='review'>";
+                    echo "<h4>" . htmlspecialchars($review['reviewer_name']) . " - " . htmlspecialchars($review['rating']) . " Star</h4>";
+                    echo "<p>" . nl2br(htmlspecialchars($review['comment'])) . "</p>";
+                    echo "<small>Date: " . date('d-m-Y H:i', strtotime($review['created_at'])) . "</small>";
+                    echo "</div>";
+                }
+            } else {
+                echo "<p>No reviews yet.</p>";
+            }
+            ?>
+        </div>
+        <script>
+            function selectStar(element) {
+                const stars = document.querySelectorAll('.star');
+                const ratingInput = document.querySelector('input[name="rating"]');
+                const value = element.getAttribute('data-value');
+
+                // Xóa class "selected" của tất cả các sao
+                stars.forEach(star => star.classList.remove('selected'));
+
+                // Gán class "selected" cho các sao tương ứng với đánh giá
+                for (let i = 0; i < value; i++) {
+                    stars[i].classList.add('selected');
+                }
+
+                // Cập nhật giá trị sao vào input ẩn
+                ratingInput.value = value;
+            }
+
+            document.getElementById('reviewForm').addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                const formData = new FormData(this);
+
+                fetch('../../controllers/ReviewController.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => response.json()) // Khẳng định phản hồi là JSON
+                    .then(data => {
+                        if (data.success) {
+                            // Hiển thị đánh giá mới
+                            const newReview = `
+                    <div class='review'>
+                        <h4>${formData.get('reviewer_name')} - ${formData.get('rating')} Star</h4>
+                        <p>${formData.get('review_text')}</p>
+                        <small>Ngày: ${new Date().toLocaleString()}</small>
+                    </div>
+                `;
+                            document.getElementById('reviewResults').insertAdjacentHTML('afterbegin', newReview);
+                            document.getElementById('reviewForm').reset();
+                            alert('Review submitted successfully!');
+                        } else {
+                            alert(data.error);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Response is not JSON:', error);
+                        alert('An error occurred. Please try again.');
+                    });
+            });
+
+        </script>
+
+    </div>
+
+</div>
+
+<div id="AdditionalInfo" class="tabcontent" style="display:none;">
+    <h3>Additional Information</h3>
+    <p>Here is the additional information about the product.</p>
+</div>
+
+<div id="SupportDocs" class="tabcontent" style="display:none;">
+    <div class="document-item">
+        <a href="https://fanimation.com/wp-content/uploads/2024/01/FP6807-Barlow_ENG-SPA-OM_01_09_24.pdf" target="_blank"> <!-- Link to the Owner's Manual -->
+            <img src="https://fanimation.com/wp-content/uploads/2020/02/document.png" alt="Owner's Manual" />
+            <p>Owner's Manual</p>
+        </a>
+    </div>
+    <div class="document-item">
+        <a href="https://fanimation.com/wp-content/uploads/2023/01/FP8406BL_SS.pdf" target="_blank"> <!-- Link to the Specification Sheet -->
+            <img src="https://fanimation.com/wp-content/uploads/2020/02/document.png" alt="Specification Sheet" />
+            <p>Specification Sheet</p>
+        </a>
+    </div>
+</div>
+
+
 
 <script>
-    function selectColor(element, colorName) {
-        // Xóa lớp 'selected' khỏi tất cả các color-box
-        const colorBoxes = document.querySelectorAll('.color-box');
-        colorBoxes.forEach(box => box.classList.remove('selected'));
+    function openTab(evt, tabName) {
+        // Declare all variables
+        var i, tabcontent, tablinks;
 
-        // Thêm lớp 'selected' vào color-box được nhấp
-        element.classList.add('selected');
-
-        // Hiển thị tên màu đã chọn
-        document.getElementById('selected-color-name').innerText = colorName;
-    }
-
-    function addToCart(productId) {
-        // Lấy màu đã chọn
-        const selectedColor = document.getElementById('selected-color-name').innerText;
-        if (selectedColor === 'Chưa chọn') {
-            alert('Vui lòng chọn màu trước khi thêm vào giỏ hàng.');
-            return;
+        // Get all elements with class="tabcontent" and hide them
+        tabcontent = document.getElementsByClassName("tabcontent");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
         }
 
-        // Gửi yêu cầu thêm sản phẩm vào giỏ hàng
-        fetch('../../controllers/cartController.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: 'action=add&product_id=' + encodeURIComponent(productId) + '&color=' + encodeURIComponent(selectedColor)
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Sản phẩm đã được thêm vào giỏ hàng!');
-                    // Cập nhật giỏ hàng trên giao diện nếu cần
-                } else {
-                    alert('Lỗi: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Đã xảy ra lỗi khi thêm vào giỏ hàng.');
-            });
+        // Get all elements with class="tablinks" and remove the class "active"
+        tablinks = document.getElementsByClassName("tablinks");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+
+        // Show the current tab, and add an "active" class to the button that opened the tab
+        document.getElementById(tabName).style.display = "block";
+        evt.currentTarget.className += " active";
     }
+
+    // Open the default tab on page load
+    document.getElementById("defaultOpen").click();
+
 </script>
+
+
 </body>
 </html>

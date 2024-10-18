@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -252,6 +252,21 @@
         .pagination a:hover:not(.active) {
             background-color: #f0f0f0;
         }
+        .filter-container {
+            margin-bottom: 20px;
+        }
+
+        .filter-container h3 {
+            margin: 10px 0 5px;
+        }
+
+        #filters {
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
 
         /* Responsive adjustments */
         @media (max-width: 1200px) {
@@ -281,6 +296,87 @@
     </style>
 </head>
 <body>
+<div id="filter-container" class="filter-container">
+    <button id="toggle-filter-btn">Show Filter</button>
+    <div id="filters" style="display: none;">
+        <h3>Filter by Category</h3>
+        <select id="category-filter">
+            <option value="">All Categories</option>
+            <option value="category1">Category 1</option>
+            <option value="category2">Category 2</option>
+        </select>
+
+        <h3>Filter by Color</h3>
+        <select id="color-filter">
+            <option value="">All Colors</option>
+            <option value="red">Red</option>
+            <option value="blue">Blue</option>
+        </select>
+
+        <h3>Filter by Size</h3>
+        <select id="size-filter">
+            <option value="">All Sizes</option>
+            <option value="s">Small</option>
+            <option value="m">Medium</option>
+            <option value="l">Large</option>
+        </select>
+
+        <h3>Filter by Price</h3>
+        <input type="number" id="min-price" placeholder="Min Price" />
+        <input type="number" id="max-price" placeholder="Max Price" />
+
+        <button id="apply-filters">Apply Filters</button>
+    </div>
+</div>
+<script>
+    document.getElementById('toggle-filter-btn').addEventListener('click', function() {
+        const filters = document.getElementById('filters');
+        const isVisible = filters.style.display === 'block';
+
+        // Hiển thị hoặc ẩn bộ lọc
+        filters.style.display = isVisible ? 'none' : 'block';
+        this.textContent = isVisible ? 'Show Filter' : 'Hide Filter';
+    });
+
+    document.getElementById('apply-filters').addEventListener('click', function() {
+        const category = document.getElementById('category-filter').value;
+        const color = document.getElementById('color-filter').value;
+        const size = document.getElementById('size-filter').value;
+        const minPrice = parseFloat(document.getElementById('min-price').value) || 0;
+        const maxPrice = parseFloat(document.getElementById('max-price').value) || Infinity;
+
+        // Lọc sản phẩm dựa trên các tiêu chí đã chọn
+        filterProducts(category, color, size, minPrice, maxPrice);
+    });
+
+    function filterProducts(category, color, size, minPrice, maxPrice) {
+        // Giả sử bạn có một danh sách các sản phẩm trong một mảng
+        const products = [
+            // Cấu trúc sản phẩm ví dụ
+            { name: 'Product 1', category: 'category1', color: 'red', size: 'm', price: 100 },
+            { name: 'Product 2', category: 'category2', color: 'blue', size: 'l', price: 200 },
+            // Thêm nhiều sản phẩm khác
+        ];
+
+        const filteredProducts = products.filter(product => {
+            return (
+                (category === '' || product.category === category) &&
+                (color === '' || product.color === color) &&
+                (size === '' || product.size === size) &&
+                (product.price >= minPrice && product.price <= maxPrice)
+            );
+        });
+
+        // Hiển thị sản phẩm đã lọc
+        displayProducts(filteredProducts);
+    }
+
+    function displayProducts(products) {
+        // Gọi hàm để hiển thị sản phẩm trong giao diện người dùng
+        console.log(products); // Ví dụ đơn giản là in ra console
+    }
+
+</script>
 <h1 style="text-align: center;">Product</h1>
 <div class="product-container">
     <?php foreach ($products as $product): ?>
@@ -293,14 +389,14 @@
                 ?>
                 <?php if (!empty($imageUrls) && count($imageUrls) > 0): ?>
                     <a href="http://localhost/Fanimation/shop/views/product/product_detail.php?id=<?php echo $productId; ?>">
-                        <img src="<?php echo htmlspecialchars(trim($imageUrls[0])); ?>"
+                        <img src="http://localhost/Fanimation/shop/<?php echo htmlspecialchars(trim($imageUrls[0])); ?>"
                              alt="<?php echo htmlspecialchars($productName . ' - Hình ảnh sản phẩm'); ?>"
-                             onerror="this.onerror=null; this.src='../../app/uploads/default-image.jpg';"
-                             data-hover-image="<?php echo htmlspecialchars(trim($imageUrls[1] ?? '../../app/uploads/default-image.jpg')); ?>">
+                             onerror="this.onerror=null; this.src='http://localhost/Fanimation/app/uploads/default-image.jpg';"
+                             data-hover-image="http://localhost/Fanimation/shop/<?php echo htmlspecialchars(trim($imageUrls[1] ?? '../../../app/uploads/default-image.jpg')); ?>">
                     </a>
                 <?php else: ?>
-                    <img src="../../app/uploads/default-image.jpg" alt="Hình ảnh không có"
-                         onerror="this.onerror=null; this.src='../../app/uploads/default-image.jpg';">
+                    <img src="http://localhost/Fanimation/app/uploads/default-image.jpg" alt="Hình ảnh không có"
+                         onerror="this.onerror=null; this.src='http://localhost/Fanimation/app/uploads/default-image.jpg';">
                 <?php endif; ?>
                 <span class="quick-view"
                       data-name="<?php echo htmlspecialchars($productName); ?>"
@@ -326,29 +422,7 @@
     <?php endforeach; ?>
 </div>
 
-<!-- Phân trang -->
-<?php if ($totalPages > 1): ?>
-    <ul class="pagination">
-        <?php if ($currentPage > 1): ?>
-            <li><a href="?page=<?php echo $currentPage - 1; ?>">&laquo; Previous</a></li>
-        <?php endif; ?>
-        <?php
-        // Xác định số trang hiển thị
-        $maxLinks = 5;
-        $start = max($currentPage - floor($maxLinks / 2), 1);
-        $end = min($start + $maxLinks - 1, $totalPages);
-        if ($end - $start + 1 < $maxLinks) {
-            $start = max($end - $maxLinks + 1, 1);
-        }
 
-        for ($i = $start; $i <= $end; $i++): ?>
-            <li><a href="?page=<?php echo $i; ?>" class="<?php echo ($i === $currentPage) ? 'active' : ''; ?>"><?php echo $i; ?></a></li>
-        <?php endfor; ?>
-        <?php if ($currentPage < $totalPages): ?>
-            <li><a href="?page=<?php echo $currentPage + 1; ?>">Next &raquo;</a></li>
-        <?php endif; ?>
-    </ul>
-<?php endif; ?>
 
 <!-- Modal -->
 <div id="quick-view-modal" class="modal" style="display:none;">
@@ -374,142 +448,175 @@
 
     </div>
 </div>
+<?php if ($totalPages > 1): ?>
+    <ul class="pagination">
+        <?php if ($currentPage > 1): ?>
+            <li><a href="?page=<?php echo $currentPage - 1; ?>">&laquo; Previous</a></li>
+        <?php endif; ?>
+        <?php
+        // Xác định số trang hiển thị
+        $maxLinks = 5;
+        $start = max($currentPage - floor($maxLinks / 2), 1);
+        $end = min($start + $maxLinks - 1, $totalPages);
+        if ($end - $start + 1 < $maxLinks) {
+            $start = max($end - $maxLinks + 1, 1);
+        }
 
+        for ($i = $start; $i <= $end; $i++): ?>
+            <li><a href="?page=<?php echo $i; ?>" class="<?php echo ($i === $currentPage) ? 'active' : ''; ?>"><?php echo $i; ?></a></li>
+        <?php endfor; ?>
+        <?php if ($currentPage < $totalPages): ?>
+            <li><a href="?page=<?php echo $currentPage + 1; ?>">Next &raquo;</a></li>
+        <?php endif; ?>
+    </ul>
+<?php endif; ?>
 
 <script>
-    document.querySelectorAll('.product-card img').forEach((img) => {
-        const originalSrc = img.src;
-        const hoverSrc = img.getAttribute('data-hover-image');
+    document.addEventListener('DOMContentLoaded', () => {
+        // Hover effect for product images
+        document.querySelectorAll('.product-card img').forEach((img) => {
+            const originalSrc = img.src;
+            const hoverSrc = img.getAttribute('data-hover-image');
 
-        img.addEventListener('mouseenter', () => {
-            img.src = hoverSrc;
-        });
-
-        img.addEventListener('mouseleave', () => {
-            img.src = originalSrc;
-        });
-    });
-
-    // Xử lý modal Quick View
-    const modal = document.getElementById('quick-view-modal');
-    const closeModal = document.querySelector('.close');
-    const modalProductName = document.getElementById('modal-product-name');
-    const modalProductDescription = document.getElementById('modal-product-description');
-    const modalProductPrice = document.getElementById('modal-product-price');
-    const modalProductDiscountPrice = document.getElementById('modal-product-discount-price'); // Thêm phần tử này cho giá sau giảm
-    const modalProductImage = document.getElementById('modal-product-image');
-    const modalProductColors = document.getElementById('modal-product-color');
-    const selectedColorName = document.getElementById('selected-color-name');
-    const thumbnailsContainer = document.getElementById('image-thumbnails');
-    const cartMessage = document.getElementById('cart-message');
-
-    let selectedColor = null; // Biến lưu trữ màu đã chọn
-
-    document.querySelectorAll('.quick-view').forEach((quickView) => {
-        quickView.addEventListener('click', () => {
-            modalProductName.textContent = quickView.getAttribute('data-name');
-            modalProductDescription.innerHTML = quickView.getAttribute('data-description');
-
-            // Lấy giá và giá giảm
-            const productPrice = parseFloat(quickView.getAttribute('data-price'));
-            const productDiscount = parseFloat(quickView.getAttribute('data-discount'));
-
-            // Hiển thị giá gốc và giá giảm
-            modalProductPrice.textContent = `Giá: ${productPrice.toLocaleString()} $`;
-            modalProductDiscountPrice.textContent = productDiscount ? `Giá khuyến mãi: ${productDiscount.toLocaleString()} $` : '';
-
-            const imageUrls = quickView.getAttribute('data-image').split(',');
-            modalProductImage.src = imageUrls[0];
-
-            thumbnailsContainer.innerHTML = '';
-            imageUrls.forEach((url) => {
-                const button = document.createElement('button');
-                button.style.backgroundImage = `url(${url})`;
-                button.addEventListener('click', () => {
-                    modalProductImage.src = url;
-                });
-                thumbnailsContainer.appendChild(button);
+            img.addEventListener('mouseenter', () => {
+                if (hoverSrc) {
+                    img.src = hoverSrc;
+                }
             });
 
-            const colors = quickView.getAttribute('data-colors') ? quickView.getAttribute('data-colors').split(',') : [];
-            modalProductColors.innerHTML = '';
-            selectedColor = null; // Đặt lại màu đã chọn khi mở modal
+            img.addEventListener('mouseleave', () => {
+                img.src = originalSrc;
+            });
+        });
 
-            if (colors.length > 0) {
-                colors.forEach((color) => {
-                    const colorBox = document.createElement('div');
-                    colorBox.className = 'color-box';
-                    colorBox.style.backgroundColor = color;
+        // Quick View Modal
+        const modal = document.getElementById('quick-view-modal');
+        const closeModal = document.querySelector('.close');
+        const modalProductName = document.getElementById('modal-product-name');
+        const modalProductDescription = document.getElementById('modal-product-description');
+        const modalProductPrice = document.getElementById('modal-product-price');
+        const modalProductDiscountPrice = document.getElementById('modal-product-discount-price');
+        const modalProductImage = document.getElementById('modal-product-image');
+        const modalProductColors = document.getElementById('modal-product-color');
+        const selectedColorName = document.getElementById('selected-color-name');
+        const thumbnailsContainer = document.getElementById('image-thumbnails');
+        const cartMessage = document.getElementById('cart-message');
 
-                    // Thêm sự kiện để chọn màu
-                    colorBox.addEventListener('click', () => {
-                        selectedColor = color; // Cập nhật màu đã chọn
-                        selectedColorName.textContent = `Selected color: ${color}`;
+        let selectedColor = null; // Variable to store selected color
+
+        // Handle "Quick View" button click
+        document.querySelectorAll('.quick-view').forEach((quickView) => {
+            quickView.addEventListener('click', () => {
+                const productName = quickView.getAttribute('data-name');
+                const productDescription = quickView.getAttribute('data-description');
+                const productPrice = parseFloat(quickView.getAttribute('data-price'));
+                const productDiscount = parseFloat(quickView.getAttribute('data-discount')) || 0;
+                const imageUrls = quickView.getAttribute('data-image').split(',');
+
+                // Debug: Check image URLs
+                console.log("Image URLs: ", imageUrls);
+
+                // Update modal content
+                modalProductName.textContent = productName;
+                modalProductDescription.innerHTML = productDescription;
+
+                // Set product price
+                modalProductPrice.textContent = `Giá: ${productPrice.toLocaleString()} $`;
+                modalProductDiscountPrice.textContent = productDiscount ? `Giá khuyến mãi: ${productDiscount.toLocaleString()} $` : '';
+
+                // Set the main product image and thumbnails
+                modalProductImage.src = `http://localhost/Fanimation/shop/${imageUrls[0]}`;
+                thumbnailsContainer.innerHTML = ''; // Clear previous thumbnails
+
+                imageUrls.forEach((url, index) => {
+                    const thumbnail = document.createElement('img');
+                    thumbnail.src = `http://localhost/Fanimation/shop/${url}`;
+                    thumbnail.className = 'thumbnail-image';
+                    thumbnail.style.width = '50px';
+                    thumbnail.style.height = '50px';
+                    thumbnail.style.margin = '5px';
+
+                    thumbnail.addEventListener('click', () => {
+                        modalProductImage.src = `http://localhost/Fanimation/shop/${url}`;
                     });
 
-                    modalProductColors.appendChild(colorBox);
+                    thumbnailsContainer.appendChild(thumbnail);
                 });
-                selectedColorName.textContent = 'Chọn màu:';
-            } else {
-                selectedColorName.textContent = 'Sản phẩm này không có màu.';
-            }
 
-            modal.style.display = 'block';
+                // Handle colors (if any)
+                const colors = quickView.getAttribute('data-colors') ? quickView.getAttribute('data-colors').split(',') : [];
+                modalProductColors.innerHTML = '';
+                selectedColor = null;
 
-            // Lấy thông tin sản phẩm để sử dụng cho addToCart
-            const productId = quickView.getAttribute('data-product-id');
-            const productName = quickView.getAttribute('data-name');
+                if (colors.length > 0) {
+                    colors.forEach((color) => {
+                        const colorBox = document.createElement('div');
+                        colorBox.className = 'color-box';
+                        colorBox.style.backgroundColor = color;
 
-            // Thêm sự kiện cho nút "Add to cart"
-            const addToCartBtn = document.querySelector('.add-to-cart-btn');
-            addToCartBtn.onclick = () => {
-                // Nếu sản phẩm không có màu, cho phép thêm vào giỏ hàng mà không cần chọn màu
-                if (colors.length > 0 && !selectedColor) {
-                    alert('Vui lòng chọn màu trước khi thêm vào giỏ hàng!');
-                    return;
+                        colorBox.addEventListener('click', () => {
+                            selectedColor = color;
+                            selectedColorName.textContent = `Màu đã chọn: ${color}`;
+                        });
+
+                        modalProductColors.appendChild(colorBox);
+                    });
+                    selectedColorName.textContent = 'Chọn màu:';
+                } else {
+                    selectedColorName.textContent = 'Sản phẩm này không có màu.';
                 }
 
-                addToCart(productId, productName, productDiscount || productPrice, selectedColor);
-            };
+                // Display the modal
+                modal.style.display = 'block';
+
+                // Handle Add to Cart
+                const productId = quickView.getAttribute('data-product-id');
+                const addToCartBtn = document.querySelector('.add-to-cart-btn');
+                addToCartBtn.onclick = () => {
+                    if (colors.length > 0 && !selectedColor) {
+                        alert('Vui lòng chọn màu trước khi thêm vào giỏ hàng!');
+                        return;
+                    }
+
+                    addToCart(productId, productName, productDiscount || productPrice, selectedColor);
+                };
+            });
         });
-    });
 
-    closeModal.addEventListener('click', () => {
-        modal.style.display = 'none';
-    });
-
-    window.addEventListener('click', (event) => {
-        if (event.target === modal) {
+        // Close modal on clicking "X" or outside modal
+        closeModal.addEventListener('click', () => {
             modal.style.display = 'none';
+        });
+
+        window.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+
+        // Add product to cart
+        function addToCart(productId, productName, productPrice, selectedColor) {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const existingProductIndex = cart.findIndex(item => item.id === productId && item.color === selectedColor);
+
+            if (existingProductIndex !== -1) {
+                cart[existingProductIndex].quantity += 1;
+            } else {
+                cart.push({ id: productId, name: productName, price: productPrice, color: selectedColor || 'Không màu', quantity: 1 });
+            }
+
+            localStorage.setItem('cart', JSON.stringify(cart));
+
+            cartMessage.textContent = `${productName} ${selectedColor ? `màu ${selectedColor}` : 'không có màu'} đã được thêm vào giỏ hàng!`;
+            cartMessage.style.display = 'block';
+
+            setTimeout(() => {
+                cartMessage.style.display = 'none';
+            }, 3000);
         }
     });
 
-    function addToCart(productId, productName, productPrice, selectedColor) {
-        const cart = JSON.parse(localStorage.getItem('cart')) || [];
-        const existingProductIndex = cart.findIndex(item => item.id === productId && item.color === selectedColor);
-
-        if (existingProductIndex !== -1) {
-            // Nếu sản phẩm đã có trong giỏ hàng, tăng số lượng
-            cart[existingProductIndex].quantity += 1;
-        } else {
-            // Nếu không, thêm sản phẩm mới vào giỏ hàng
-            cart.push({ id: productId, name: productName, price: productPrice, color: selectedColor || 'Không màu', quantity: 1 });
-        }
-
-        localStorage.setItem('cart', JSON.stringify(cart));
-
-        // Hiển thị thông báo đã thêm vào giỏ hàng
-        cartMessage.textContent = `${productName} ${selectedColor ? `màu ${selectedColor}` : 'không có màu'} đã được thêm vào giỏ hàng!`;
-        cartMessage.style.display = 'block';
-
-        // Ẩn thông báo sau 3 giây
-        setTimeout(() => {
-            cartMessage.style.display = 'none';
-        }, 3000);
-    }
 </script>
-
-
 
 </body>
 </html>
